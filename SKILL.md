@@ -7,6 +7,12 @@ description: Use whenever the user asks to install, update, remove, or edit an a
 
 This skill owns the user's conventions for managing agent skills on their machine — installs, updates, removals, and edits. It exists because skill management has a few easy-to-miss footguns (`-a '*'`, tool-bundled installers, hand-editing the installed copy) that quietly break either the install graph or the source-of-truth contract. Follow the rules below before touching anything under `~/.agents/skills/` or `~/.claude/skills/`.
 
+## Capturing new skill-management feedback
+
+If the user gives you a new rule, correction, or preference about how skills get installed / updated / edited (or about meta-tooling like `npx skills`, lockfile management, harness targets), **add it to this SKILL.md** via the edit-via-source flow (Rule 3 below) — not to auto-memory. Auto-memory is harness-specific (Claude Code only) and won't travel to Codex CLI, Gemini CLI, or other harnesses; this skill will. The rules in this file were themselves migrated out of auto-memory for exactly that reason; don't recreate the problem.
+
+The same goes for new conventions about *creating* skills (boilerplate, repo layout, README structure, `gh repo create` flags): they belong here, in the relevant "End-to-end flow" section.
+
 ## Layout on disk
 
 - `~/.agents/skills/<name>/` — canonical install location. The actual files live here.
