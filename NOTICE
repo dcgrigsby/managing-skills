@@ -1,0 +1,27 @@
+managing-skills
+Copyright 2026 Dan Grigsby
+
+This skill teaches AI agents the user's conventions for installing,
+updating, and editing other agent skills. It does not itself execute
+any installs or edits — it provides guidance to the agent invoking
+it. The agent is responsible for executing the documented commands
+on the user's machine.
+
+By installing or using this skill, you acknowledge that:
+
+1. The conventions encoded here (canonical -a flags, no tool-bundled
+   installers, edit-via-source) are opinionated and reflect one
+   user's setup. They may not match your own workflow.
+2. Following the documented end-to-end flows will create or modify
+   files under ~/.agents/skills/, ~/.claude/skills/, and
+   ~/.agents/.skill-lock.json. Review the commands before running
+   them if you are not certain of their effect.
+3. The "create a new skill" flow creates a public GitHub repository
+   by default, which is irreversible (deleting the repo afterward
+   does not remove copies that may have been cloned or indexed).
+4. The authors and contributors provide NO WARRANTY of any kind
+   and accept NO LIABILITY for any damages arising from use of
+   this software.
+
+This notice must be preserved in all copies or substantial portions
+of the software, per the Apache License, Version 2.0.
