@@ -84,6 +84,55 @@ When the user asks for a behavior change to a skill installed under `~/.agents/s
 
 - The corresponding local clone is usually at `~/<name>-skill/`. If it's missing, clone it from `sourceUrl` before editing.
 
+### Recovery: skill exists on disk but isn't in the lockfile
+
+If `npx skills update <name>` returns `No installed skills found matching: <name>`, the skill is installed under `~/.agents/skills/<name>/` but isn't tracked in `~/.agents/.skill-lock.json`. Common causes: installed before the lockfile existed, manually `git clone`'d, or installed by a tool-bundled installer in violation of Rule 1. **Recovery: `npx skills add <repo> -g -a claude-code -a gemini-cli -a codex -y`** — this overwrites the on-disk copy and registers the entry, after which `update` works normally.
+
+Detect up front before relying on `update`:
+
+```bash
+jq -e '.skills["<name>"]' ~/.agents/.skill-lock.json >/dev/null && echo tracked || echo untracked
+```
+
+## Rule 4 — Keep `description:` under 1024 characters
+
+Codex CLI (and Gemini CLI, by the same loader contract) enforces a **1024-character limit** on the `description:` field in the SKILL.md frontmatter. **Skills that exceed it are silently skipped at startup** — Codex prints a one-line warning before its banner (`Skipped loading 1 skill(s) … invalid description: exceeds maximum length of 1024 characters`) but the skill simply isn't loaded. Claude Code does not enforce this limit, so an oversized description can ship and quietly disappear from the other harnesses without anything in the Claude Code session noticing.
+
+**Why:** Hard limit in the loader — no truncation, no fallback. Easy to miss because (a) `npx skills add` / `update` happily installs an oversized description without warning, and (b) Claude Code keeps working, so the user sees the skill there and assumes it's fine everywhere.
+
+**How to apply:**
+
+- Before committing any SKILL.md change that touches the description, check the length:
+
+  ```bash
+  python3 -c "import yaml,sys; t=open(sys.argv[1]).read(); e=t.find('\n---',3); d=yaml.safe_load(t[3:e])['description']; print(len(d), '/', 1024)" SKILL.md
+  ```
+
+- Aim for ≤ ~1000 chars to leave headroom. When trimming, preserve every trigger phrase and disambiguator — compress prose instead (drop redundant examples, tighten "Designed to run from inside the X — does not support Y" to "Run from X; no Y", collapse parenthetical lists).
+- After install / update, verify Codex loads it cleanly:
+
+  ```bash
+  codex exec "ok" 2>&1 | grep -iE 'skipped|invalid description|exceeds'
+  ```
+
+  Empty output = clean. Any hit = still rejected; re-fix the source and re-run the edit flow.
+- Audit all installed skills at once:
+
+  ```bash
+  cd ~/.agents/skills && python3 -c "
+  import os, yaml
+  for d in sorted(os.listdir('.')):
+      f = os.path.join(d, 'SKILL.md')
+      if not os.path.isfile(f): continue
+      txt = open(f).read()
+      if not txt.startswith('---'): continue
+      end = txt.find('\n---', 3)
+      desc = (yaml.safe_load(txt[3:end]) or {}).get('description','') or ''
+      if len(desc) > 1024:
+          print(f'OVER {len(desc):5d} {d}')
+  "
+  ```
+
 ## End-to-end flow for a skill edit
 
 For "change the X skill so it does Y":
@@ -92,8 +141,9 @@ For "change the X skill so it does Y":
 2. Verify the local clone exists at `~/<X>-skill/`. If not, `git clone <sourceUrl> ~/<X>-skill/`.
 3. Edit `~/<X>-skill/SKILL.md` (or other files in the repo).
 4. Commit with a descriptive message; push to the origin. **If push fails, stop and surface the failure.**
-5. Run `npx skills update <X> -g -a claude-code -a gemini-cli -a codex -y`.
+5. Run `npx skills update <X> -g -a claude-code -a gemini-cli -a codex -y`. If it reports `No installed skills found matching: <X>`, fall through to `npx skills add <repo> -g -a claude-code -a gemini-cli -a codex -y` (see "Recovery: skill exists on disk but isn't in the lockfile" above).
 6. Verify the installed file under `~/.agents/skills/<X>/` reflects the new content.
+7. If the edit touched the `description:` field, run `codex exec "ok" 2>&1 | grep -iE 'skipped|invalid description|exceeds'` — empty output confirms Codex accepted the new description (see Rule 4).
 
 ## End-to-end flow for a new skill
 
