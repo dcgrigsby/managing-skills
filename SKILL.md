@@ -1,5 +1,5 @@
 ---
-name: managing-skills-skill
+name: managing-skills
 description: Use whenever the user asks to install, update, remove, or edit an agent skill on their machine, or when a tool offers to install its own bundled skill. Triggers on phrases like "install this skill", "add a skill", "update X skill", "edit the X skill to do Y", "change behavior of the X skill", "the foo CLI says I can `foo skill install` — should I?", or any time the agent is about to modify a file under `~/.agents/skills/` or `~/.claude/skills/`. Owns the user's conventions for how skills get installed (always via `npx skills`, never via tool-bundled installers) and how they get edited (source repo + push + `npx skills update`, never hand-edit the installed copy). Skip when the work is purely *using* a loaded skill — only use when the request is about the skill itself as an artifact (install / update / remove / edit / inspect).
 ---
 

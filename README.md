@@ -1,4 +1,4 @@
-# managing-skills-skill
+# managing-skills
 
 A portable skill that teaches AI agents the user's conventions for installing, updating, and editing other agent skills. It captures three rules — always use `npx skills` (never tool-bundled installers), the canonical `-a` flag list for `add` / `update`, and edit-via-source (never hand-edit the installed copy).
 
