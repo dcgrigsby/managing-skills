@@ -1,4 +1,4 @@
-# managing-skills
+# managing-skills-skill
 
 A portable skill that teaches AI agents the user's conventions for installing, updating, and editing other agent skills. It captures three rules — always use `npx skills` (never tool-bundled installers), the canonical `-a` flag list for `add` / `update`, and edit-via-source (never hand-edit the installed copy).
 
@@ -17,7 +17,7 @@ These aren't theoretical — the rules in [SKILL.md](SKILL.md) come from inciden
 ## Install
 
 ```bash
-npx skills add dcgrigsby/managing-skills -g -a claude-code -a gemini-cli -a codex -y
+npx skills add dcgrigsby/managing-skills-skill -g -a claude-code -a gemini-cli -a codex -y
 ```
 
 Or clone this repo and point your skill-loader at the directory.

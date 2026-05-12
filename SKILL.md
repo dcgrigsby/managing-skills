@@ -1,5 +1,5 @@
 ---
-name: managing-skills
+name: managing-skills-skill
 description: Use whenever the user asks to install, update, remove, or edit an agent skill on their machine, or when a tool offers to install its own bundled skill. Triggers on phrases like "install this skill", "add a skill", "update X skill", "edit the X skill to do Y", "change behavior of the X skill", "the foo CLI says I can `foo skill install` — should I?", or any time the agent is about to modify a file under `~/.agents/skills/` or `~/.claude/skills/`. Owns the user's conventions for how skills get installed (always via `npx skills`, never via tool-bundled installers) and how they get edited (source repo + push + `npx skills update`, never hand-edit the installed copy). Skip when the work is purely *using* a loaded skill — only use when the request is about the skill itself as an artifact (install / update / remove / edit / inspect).
 ---
 
@@ -18,7 +18,7 @@ The same goes for new conventions about *creating* skills (boilerplate, repo lay
 - `~/.agents/skills/<name>/` — canonical install location. The actual files live here.
 - `~/.claude/skills/<name>` — symlink into `~/.agents/skills/<name>/` for Claude Code. Created by `npx skills` for harnesses that don't read `~/.agents/skills/` directly.
 - `~/.agents/.skill-lock.json` — tracks which skills are installed, the GitHub source for each, and the commit hash. `npx skills update` reads this to know what to pull.
-- `~/<name>-skill/` — the user's local source repo for skills they author or maintain (`personal-workflow-skill`, `omnifocus-skill`, `obsidian-skill`, `slack-skill`, `screenshot-skill`, `autoresearch-skill`, `managing-skills`, etc.). These are the **only** files to edit when changing skill behavior.
+- `~/<name>-skill/` — the user's local source repo for skills they author or maintain (`personal-workflow-skill`, `omnifocus-skill`, `obsidian-skill`, `slack-skill`, `screenshot-skill`, `autoresearch-skill`, `managing-skills-skill`, etc.). These are the **only** files to edit when changing skill behavior.
 
 Use `~/.agents/.skill-lock.json` to find a skill's source repo:
 
